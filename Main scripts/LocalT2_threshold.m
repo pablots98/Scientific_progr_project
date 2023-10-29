@@ -45,6 +45,8 @@ correctly_identified = intersect(core_genes_tab.core_genes, hkg_met_ens.Ensembl_
 hkg_met_ens = table2array(hkg_met(:, 'Ensembl_GeneID'));
 percentage_correct = (length(correctly_identified) / length(hkg_met_ens)) * 100;
 disp(['Correctly identified housekeeping genes: ', num2str(percentage_correct), '%']);
+% Save the correctly_identified to have the genes identifiers
+writecell(correctly_identified, 'HK_core_T2_FPKM.csv');
 
 %%% Metabolic Housekeeping Genes %%%
 % Analyze coverage of metabolic housekeeping genes in each sample
@@ -96,6 +98,8 @@ correctly_identified = intersect(core_genes_tab.core_genes, hkg_met_ens.Ensembl_
 hkg_met_ens = table2array(hkg_met(:, 'Ensembl_GeneID'));
 percentage_correct = (length(correctly_identified) / length(hkg_met_ens)) * 100;
 disp(['Correctly identified housekeeping genes (TPM): ', num2str(percentage_correct), '%']);
+% Save the correctly_identified to have the genes identifiers
+writecell(correctly_identified, 'HK_core_T2_TPM.csv');
 
 %%% Metabolic Housekeeping Genes (TPM) %%%
 sel_rows = coreMat(index_names == 1, :);
