@@ -46,6 +46,8 @@ hkg_met = data_met(index_names, :); % Extract rows corresponding to housekeeping
 correctly_identified = intersect(core_genes_tab.core_genes, hkg_met.Ensembl_GeneID); % Core housekeeping genes
 percentage_correct = (length(correctly_identified) / length(hkg_met.Ensembl_GeneID)) * 100; % Percentage of correctly identified core housekeeping genes
 disp(['Correctly identified housekeeping genes: ', num2str(percentage_correct), '%']);
+% Save the correctly_identified to have the genes identifiers
+writecell(correctly_identified, 'HK_core_gini_FPKM.csv');
 
 %%% Metabolic housekeeping genes %%%
 
@@ -89,9 +91,49 @@ hkg_met = data_met(index_names, :);
 correctly_identified = intersect(core_genes_tab.core_genes, hkg_met.Ensembl_GeneID);
 percentage_correct = (length(correctly_identified) / length(hkg_met.Ensembl_GeneID)) * 100;
 disp(['Correctly identified housekeeping genes: ', num2str(percentage_correct), '%']);
+% Save the correctly_identified to have the genes identifiers
+writecell(correctly_identified, 'HK_core_gini_TPM.csv');
 sel_rows = gini(index_names == 1, :);
 num_ones = sum(sel_rows, 1);
 num_rows = size(sel_rows, 1);
 prop_genes = num_ones / num_rows;
 expression_col = data_met.Properties.VariableNames(2:end);
 results_col_TPM = array2table(prop_genes, 'VariableNames', expression_col)
+
+%-------------- Compare core HK of localT2 and localgini ---------------------------------
+% Load LocalT2 gene identifiers for FPKM and TPM
+core_hk_Local_FPKM = readtable('HK_core_T2_FPKM.csv');
+core_hk_Local_TPM = readtable('HK_core_T2_TPM.csv');
+% Load Localgini gene identifiers for FPKM and TPM
+core_hk_gini_FPKM = readtable('HK_core_gini_FPKM.csv');
+core_hk_gini_TPM = readtable('HK_core_gini_TPM.csv');
+
+%%For FPKM
+% Find the gene names that are in both datasets
+common_genes = intersect(core_hk_Local_FPKM, core_hk_gini_FPKM);
+
+% Find the rows in each dataset corresponding to the common genes
+rows_data_T2 = ismember(core_hk_Local_FPKM, common_genes);
+rows_data_gini = ismember(core_hk_gini_FPKM, common_genes);
+
+% Extract the data for the common genes
+common_data1 = core_hk_Local_FPKM(rows_data_T2, :);
+common_data2 = core_hk_gini_FPKM(rows_data_gini, :);
+
+% Display the number of common genes
+disp(['Number of common genes: ', num2str(height(common_data1))]);
+
+%%For TPM
+% Find the gene names that are in both datasets
+common_genes = intersect(core_hk_Local_TPM, core_hk_gini_TPM);
+
+% Find the rows in each dataset corresponding to the common genes
+rows_data_T2 = ismember(core_hk_Local_TPM, common_genes);
+rows_data_gini = ismember(core_hk_gini_TPM, common_genes);
+
+% Extract the data for the common genes
+common_data1 = core_hk_Local_TPM(rows_data_T2, :);
+common_data2 = core_hk_gini_TPM(rows_data_gini, :);
+
+% Display the number of common genes
+disp(['Number of common genes: ', num2str(height(common_data1))]);
